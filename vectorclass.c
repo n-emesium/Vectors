@@ -57,7 +57,7 @@ int pull(vector *v, int n) { //for removing a specific element;
     int i = indexof(v,n);
     if (i == -1) {
         printf("No such element found. ");
-        return;
+        return -1;
     }
     int f = v->arr[i];
     for (int j = i; j < v->size-1; j++) {
