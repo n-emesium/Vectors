@@ -7,6 +7,7 @@ typedef struct {
     int size;
     int *arr;
 } vector;
+int int get(vector *v,int i);
 int indexof(vector *v, int n);
 void create(vector *v);
 bool checkc(vector *v);
