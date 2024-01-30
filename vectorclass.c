@@ -8,6 +8,9 @@ typedef struct {
     int size;
     int *arr;
 } vector;
+int get(vector *v,int i) {
+    return v->arr[i];
+}
 int indexof(vector *v, int n) { //n is the element to be searched for;
     int index = -1;
     for (int i = 0; i < v->size; i++) {
