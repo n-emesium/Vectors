@@ -8,7 +8,11 @@ typedef struct {
     int size;
     int *arr;
 } vector;
-int get(vector *v,int i) {
+int get(vector *v, size_t i) {
+    if (i >= v->size) {
+        printf("Index out of bounds. ");
+        exit(EXIT_FAILURE);
+    }
     return v->arr[i];
 }
 int indexof(vector *v, int n) { //n is the element to be searched for;
