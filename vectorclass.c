@@ -8,7 +8,7 @@ typedef struct {
     int size;
     int *arr;
 } vector;
-int get(vector *v, size_t i) {
+int get(vector *v,int i) {
     if (i >= v->size) {
         printf("Index out of bounds. ");
         exit(EXIT_FAILURE);
