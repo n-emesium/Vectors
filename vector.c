@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <time.h>
 #define LIM 100
+#define swapi(v, i, j) (iswap(v, i, j))
+#define swapf(v, i, j) (fswap(v, i, j))
+#define swapc(v, i, j) (cswap(v, i, j))
 static char alph[26];
 void init() {
     int i = 0;
@@ -350,14 +353,41 @@ void clear(vector *v) { //sets all elements to 0
             break;
     }
 }
+void shuffle(vector *v) { //this function will guarantee an unbiased shuffle;
+    switch (v->type) {
+        case TYPE_INT:
+            for (int i = v->size - 1; i > 0; i--) { //[0, ... , size - 1]; len = size
+                int x = rand() % (i + 1); //x < i
+                iswap(v, i, x);
+            }
+            //iswap(v, 0, v->size - 1);
+            break;
+        case TYPE_FLOAT:
+            for (int i = v->size - 1; i > 0; i--) {
+                int x = rand() % (i + 1);
+                fswap(v, i, x);
+            }
+            //fswap(v, 0, v->size - 1);
+            break;
+        case TYPE_CHAR:
+            for (int i = v->size - 1; i > 0; i--) {
+                int x = rand() % (i + 1);
+                cswap(v, i, x);
+            }
+            //swapc(v, 0, v->size - 1);
+            break;
+    }
+}
 void freev(vector *v) {
     free(v->arr);
     free(v);
 }
 int main() {
     srand(time(NULL));
-    vector *v = create(10, TYPE_INT);
+    vector *v = create(20, TYPE_INT);
     fill(v);
+    printv(v);
+    shuffle(v);
     printv(v);
     freev(v);
     return 0;
