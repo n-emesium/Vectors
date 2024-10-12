@@ -6,6 +6,10 @@
 #define swapi(v, i, j) (iswap(v, i, j))
 #define swapf(v, i, j) (fswap(v, i, j))
 #define swapc(v, i, j) (cswap(v, i, j))
+#define vprint(v) (printv(v))
+#define tint TYPE_INT
+#define tfloat TYPE_FLOAT
+#define tchar TYPE_CHAR
 static char alph[26];
 void init() {
     int i = 0;
@@ -276,12 +280,15 @@ int pivot(vector *v, int l, int r) {
     }
     return -1; // Handle error
 }
-void sort(vector *v, int l, int r) { 
+void usort(vector *v, int l, int r) { 
     if (l < r) {
         int piv = pivot(v, l, r);
-        sort(v, l, piv - 1);
-        sort(v, piv + 1, r);
+        usort(v, l, piv - 1);
+        usort(v, piv + 1, r);
     }
+}
+void sort(vector *v) {
+    usort(v, 0, v->size - 1);
 }
 void printv(vector *v) {
     switch (v->type) {
@@ -378,17 +385,162 @@ void shuffle(vector *v) { //this function will guarantee an unbiased shuffle;
             break;
     }
 }
+/**
+ * Merges two vectors into a new vector.
+ * 
+ * @param v1 The first vector.
+ * @param v2 The second vector.
+ * @return A new vector containing elements of both vectors.
+ */
+
+vector *merge(vector *v1, vector *v2) {
+    if (v1->type == v2->type) {
+        vector *v3 = create(v1->size + v2->size, v1->type);
+        if (v1->type == tint) {
+            for (int i = 0; i < v1->size; i++) {
+                ((int *)v3->arr)[i] = ((int *)v1->arr)[i];
+            }
+            for (int i = 0; i < v2->size; i++) {
+                ((int *)v3->arr)[i + v1->size] = ((int *)v2->arr)[i];
+            }
+        } else if (v1->type == tfloat) {
+            for (int i = 0; i < v1->size; i++) {
+                ((float *)v3->arr)[i] = ((float *)v1->arr)[i];
+            }
+            for (int i = 0; i < v2->size; i++) {
+                ((float *)v3->arr)[i + v1->size] = ((float *)v2->arr)[i];
+            }
+        } else if (v1->type == tchar) {
+            for (int i = 0; i < v1->size; i++) {
+                ((char *)v3->arr)[i] = ((char *)v1->arr)[i];
+            }
+            for (int i = 0; i < v2->size; i++) {
+                ((char *)v3->arr)[i + v1->size] = ((char *)v2->arr)[i];
+            }
+        }
+        
+        return v3;
+    } else {
+        printf("Fatal error: vector types do not match.\n");
+        return NULL;
+    }
+}
+
+void reverse(vector *v) {
+    switch (v->type) {
+        case tint:
+            for (int i = 0; i < v->size / 2; i++) {
+                iswap(v, i, v->size - i - 1);
+            }
+            break;
+        case tfloat:
+            for (int i = 0; i < v->size / 2; i++) {
+                fswap(v, i, v->size - i - 1);
+            }
+            break;
+        case tchar:
+            for (int i = 0; i < v->size / 2; i++) {
+                cswap(v, i, v->size - i - 1);
+            }
+            break;
+    }
+}
+vector *clone(vector *v) {
+    if (v == NULL) {
+        printf("Fatal error: vector is NULL.\n");
+        return NULL;
+    }
+    vector *c = create(v->size, v->type);
+    if (v->type == tint) {
+        for (int i = 0; i < v->size; i++) {
+            ((int *)c->arr)[i] = ((int *)v->arr)[i];
+        }
+    } else if (v->type == tfloat) {
+        for (int i = 0; i < v->size; i++) {
+            ((float *)c->arr)[i] = ((float *)v->arr)[i];
+        }
+    } else if (v->type == tchar) {
+        for (int i = 0; i < v->size; i++) {
+            ((char *)c->arr)[i] = ((char *)v->arr)[i];
+        }
+    }
+    return c;
+}
 void freev(vector *v) {
     free(v->arr);
     free(v);
 }
-int main() {
+void driver() { //you can use this to test your code
+    // Test for Integer Vector
+    init();
     srand(time(NULL));
-    vector *v = create(20, TYPE_INT);
-    fill(v);
-    printv(v);
-    shuffle(v);
-    printv(v);
-    freev(v);
+    printf("Testing Integer Vector:\n");
+    vector *v_int = create(10, TYPE_INT);
+    fill(v_int);
+    printf("Filled Vector: ");
+    printv(v_int);
+    
+    shuffle(v_int);
+    printf("Shuffled Vector: ");
+    printv(v_int);
+    
+    sort(v_int);
+    printf("Sorted Vector: ");
+    printv(v_int);
+    
+    int val_to_add = 42;
+    push_back(v_int, &val_to_add);
+    printf("After Push Back (42): ");
+    printv(v_int);
+    
+    int index_to_delete = 3; // Delete index 3
+    delete(v_int, index_to_delete);
+    printf("After Deleting Index 3: ");
+    printv(v_int);
+    
+    // Cleanup
+    freev(v_int);
+    
+    // Test for Float Vector
+    printf("\nTesting Float Vector:\n");
+    vector *v_float = create(5, TYPE_FLOAT);
+    fill(v_float);
+    printf("Filled Vector: ");
+    printv(v_float);
+    
+    sort(v_float);
+    printf("Sorted Vector: ");
+    printv(v_float);
+    
+    float float_val_to_add = 3.14;
+    push_back(v_float, &float_val_to_add);
+    printf("After Push Back (3.14): ");
+    printv(v_float);
+    
+    // Cleanup
+    freev(v_float);
+    
+    // Test for Character Vector
+    printf("\nTesting Character Vector:\n");
+    vector *v_char = create(8, TYPE_CHAR);
+    fill(v_char);
+    printf("Filled Vector: ");
+    printv(v_char);
+    
+    sort(v_char);
+    printf("Sorted Vector: ");
+    printv(v_char);
+    
+    char char_val_to_add = 'z';
+    push_back(v_char, &char_val_to_add);
+    printf("After Push Back ('z'): ");
+    printv(v_char);
+    
+    // Cleanup
+    freev(v_char);
+}
+
+int main() {
+    driver(); // Call the driver function to test
     return 0;
 }
